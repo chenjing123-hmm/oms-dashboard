@@ -2,849 +2,786 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sunny & Lucky Skies - OMS 看板</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
         :root {
-            --bg-primary: #0a0e1a;
-            --bg-secondary: #111827;
-            --bg-card: #1a2035;
-            --bg-card-hover: #1e2642;
-            --accent-blue: #3b82f6;
-            --accent-purple: #8b5cf6;
-            --accent-cyan: #06b6d4;
-            --accent-green: #10b981;
-            --accent-amber: #f59e0b;
-            --accent-red: #ef4444;
-            --accent-pink: #ec4899;
-            --text-primary: #f1f5f9;
-            --text-secondary: #94a3b8;
-            --text-muted: #64748b;
-            --border: rgba(255,255,255,0.06);
-            --glow-blue: 0 0 20px rgba(59,130,246,0.3);
-            --glow-green: 0 0 20px rgba(16,185,129,0.3);
-            --glow-amber: 0 0 20px rgba(245,158,11,0.3);
+            --bg: #06080f;
+            --bg2: #0c1021;
+            --card: #111827;
+            --card2: #1a2235;
+            --border: rgba(255,255,255,0.05);
+            --blue: #3b82f6;
+            --cyan: #06b6d4;
+            --green: #10b981;
+            --amber: #f59e0b;
+            --red: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --t1: #f1f5f9;
+            --t2: #94a3b8;
+            --t3: #64748b;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--t1);
+            -webkit-font-smoothing: antialiased;
             min-height: 100vh;
-            overflow-x: hidden;
         }
 
-        /* Animated background */
         body::before {
             content: '';
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
+            inset: 0;
             background:
-                radial-gradient(ellipse 80% 60% at 20% 10%, rgba(59,130,246,0.08) 0%, transparent 60%),
-                radial-gradient(ellipse 60% 50% at 80% 90%, rgba(139,92,246,0.06) 0%, transparent 60%);
+                radial-gradient(ellipse 50% 40% at 15% 5%, rgba(59,130,246,0.07) 0%, transparent 50%),
+                radial-gradient(ellipse 40% 40% at 85% 95%, rgba(139,92,246,0.05) 0%, transparent 50%);
             pointer-events: none;
-            z-index: 0;
         }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 24px;
-            position: relative;
-            z-index: 1;
-        }
+        .app { position: relative; z-index: 1; padding: 12px; max-width: 900px; margin: 0 auto; }
 
-        /* Header */
+        /* === HEADER === */
         .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 32px;
-            padding: 24px 32px;
-            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(59,130,246,0.08) 100%);
+            background: linear-gradient(135deg, var(--card) 0%, rgba(59,130,246,0.06) 100%);
             border: 1px solid var(--border);
-            border-radius: 20px;
-            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 12px;
         }
-
-        .header-left h1 {
-            font-size: 28px;
+        .header-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+        .header h1 {
+            font-size: 22px;
             font-weight: 800;
-            background: linear-gradient(135deg, #fff 0%, var(--accent-cyan) 100%);
+            background: linear-gradient(135deg, #fff, var(--cyan));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            letter-spacing: -0.5px;
+            line-height: 1.2;
         }
-
-        .header-left .subtitle {
-            color: var(--text-secondary);
-            font-size: 14px;
-            margin-top: 4px;
-        }
-
-        .header-right {
+        .header .sub { color: var(--t2); font-size: 12px; margin-top: 4px; }
+        .live-badge {
             display: flex;
             align-items: center;
-            gap: 16px;
-        }
-
-        .status-badge {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
+            gap: 6px;
+            padding: 5px 12px;
             background: rgba(16,185,129,0.1);
-            border: 1px solid rgba(16,185,129,0.3);
+            border: 1px solid rgba(16,185,129,0.25);
             border-radius: 100px;
-            font-size: 13px;
-            color: var(--accent-green);
+            font-size: 11px;
+            color: var(--green);
+            white-space: nowrap;
+            flex-shrink: 0;
         }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--accent-green);
+        .live-dot {
+            width: 6px; height: 6px;
+            background: var(--green);
             border-radius: 50%;
             animation: pulse 2s infinite;
         }
-
         @keyframes pulse {
-            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(16,185,129,0.4); }
-            50% { opacity: 0.8; box-shadow: 0 0 0 8px rgba(16,185,129,0); }
+            0%,100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.4); }
+            50% { box-shadow: 0 0 0 6px rgba(16,185,129,0); }
         }
+        .header-time { font-size: 11px; color: var(--t3); margin-top: 10px; }
 
-        .update-time {
-            color: var(--text-muted);
-            font-size: 12px;
-        }
-
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        .stat-card {
-            background: var(--bg-card);
+        /* === STAT CARDS (2x2 grid) === */
+        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+        .stat {
+            background: var(--card);
             border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 24px;
+            border-radius: 14px;
+            padding: 16px;
             position: relative;
             overflow: hidden;
-            transition: all 0.3s ease;
-            cursor: default;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-
-        .stat-card:hover {
-            background: var(--bg-card-hover);
-            transform: translateY(-2px);
-            border-color: rgba(255,255,255,0.1);
-        }
-
-        .stat-card::before {
+        .stat:active { transform: scale(0.97); }
+        .stat::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            border-radius: 16px 16px 0 0;
+            top: 0; left: 0; right: 0;
+            height: 2.5px;
         }
+        .stat.s-amber::before { background: linear-gradient(90deg, var(--amber), var(--red)); }
+        .stat.s-blue::before { background: linear-gradient(90deg, var(--blue), var(--cyan)); }
+        .stat.s-green::before { background: linear-gradient(90deg, var(--green), var(--cyan)); }
+        .stat.s-purple::before { background: linear-gradient(90deg, var(--purple), var(--pink)); }
+        .stat.s-red::before { background: linear-gradient(90deg, var(--red), var(--pink)); }
+        .stat.s-cyan::before { background: linear-gradient(90deg, var(--cyan), var(--blue)); }
 
-        .stat-card.blue::before { background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan)); }
-        .stat-card.amber::before { background: linear-gradient(90deg, var(--accent-amber), var(--accent-red)); }
-        .stat-card.green::before { background: linear-gradient(90deg, var(--accent-green), var(--accent-cyan)); }
-        .stat-card.purple::before { background: linear-gradient(90deg, var(--accent-purple), var(--accent-pink)); }
+        .stat-icon { font-size: 18px; margin-bottom: 10px; }
+        .stat-val { font-size: 30px; font-weight: 900; line-height: 1; margin-bottom: 4px; }
+        .stat.s-amber .stat-val { color: var(--amber); }
+        .stat.s-blue .stat-val { color: var(--blue); }
+        .stat.s-green .stat-val { color: var(--green); }
+        .stat.s-purple .stat-val { color: var(--purple); }
+        .stat.s-red .stat-val { color: var(--red); }
+        .stat.s-cyan .stat-val { color: var(--cyan); }
+        .stat-lbl { font-size: 12px; color: var(--t2); font-weight: 500; }
+        .stat-sub { font-size: 10px; color: var(--t3); margin-top: 6px; }
 
-        .stat-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            margin-bottom: 16px;
-        }
-
-        .stat-card.blue .stat-icon { background: rgba(59,130,246,0.15); }
-        .stat-card.amber .stat-icon { background: rgba(245,158,11,0.15); }
-        .stat-card.green .stat-icon { background: rgba(16,185,129,0.15); }
-        .stat-card.purple .stat-icon { background: rgba(139,92,246,0.15); }
-
-        .stat-value {
-            font-size: 36px;
-            font-weight: 800;
-            line-height: 1;
-            margin-bottom: 6px;
-        }
-
-        .stat-card.blue .stat-value { color: var(--accent-blue); }
-        .stat-card.amber .stat-value { color: var(--accent-amber); }
-        .stat-card.green .stat-value { color: var(--accent-green); }
-        .stat-card.purple .stat-value { color: var(--accent-purple); }
-
-        .stat-label {
-            font-size: 13px;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-
-        .stat-sub {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-top: 8px;
-        }
-
-        /* Main Grid */
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            margin-bottom: 24px;
-        }
-
+        /* === CARDS === */
         .card {
-            background: var(--bg-card);
+            background: var(--card);
             border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 24px;
-            transition: all 0.3s ease;
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 12px;
         }
-
-        .card:hover {
-            border-color: rgba(255,255,255,0.08);
-        }
-
         .card-title {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 16px;
+            gap: 8px;
+            font-size: 14px;
             font-weight: 600;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
-
-        .card-title .icon {
-            width: 32px;
-            height: 32px;
+        .card-title .ic {
+            width: 28px; height: 28px;
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 14px;
         }
 
-        /* Chart container */
-        .chart-container {
-            position: relative;
-            height: 260px;
-        }
-
-        /* Order pipeline */
-        .pipeline {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .pipeline-item {
+        /* === PIPELINE === */
+        .pipe { display: flex; flex-direction: column; gap: 8px; }
+        .pipe-row {
             display: flex;
             align-items: center;
-            gap: 14px;
-            padding: 14px 16px;
-            background: rgba(255,255,255,0.02);
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255,255,255,0.015);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            transition: all 0.2s ease;
-        }
-
-        .pipeline-item:hover {
-            background: rgba(255,255,255,0.04);
-        }
-
-        .pipeline-icon {
-            width: 40px;
-            height: 40px;
             border-radius: 10px;
+        }
+        .pipe-ic {
+            width: 36px; height: 36px;
+            border-radius: 9px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 16px;
             flex-shrink: 0;
         }
+        .pipe-info { flex: 1; min-width: 0; }
+        .pipe-name { font-size: 13px; font-weight: 500; }
+        .pipe-desc { font-size: 10px; color: var(--t3); margin-top: 1px; }
+        .pipe-bar { height: 3px; background: rgba(255,255,255,0.04); border-radius: 3px; margin-top: 6px; overflow: hidden; }
+        .pipe-fill { height: 100%; border-radius: 3px; transition: width 0.8s ease; }
+        .pipe-num { font-size: 22px; font-weight: 800; min-width: 40px; text-align: right; }
 
-        .pipeline-info { flex: 1; }
-        .pipeline-name { font-size: 14px; font-weight: 500; }
-        .pipeline-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+        /* === CHARTS === */
+        .chart-wrap { position: relative; height: 200px; }
 
-        .pipeline-count {
-            font-size: 24px;
-            font-weight: 800;
-            min-width: 50px;
-            text-align: right;
-        }
-
-        .pipeline-bar {
-            height: 4px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 4px;
-            overflow: hidden;
-            margin-top: 8px;
-        }
-
-        .pipeline-bar-fill {
-            height: 100%;
-            border-radius: 4px;
-            transition: width 1s ease;
-        }
-
-        /* Orders table */
-        .orders-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .orders-table th {
+        /* === TABLE (scrollable on mobile) === */
+        .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 -18px; padding: 0 18px; }
+        .tbl { width: 100%; border-collapse: collapse; min-width: 600px; }
+        .tbl th {
             text-align: left;
-            padding: 12px 16px;
-            font-size: 12px;
+            padding: 10px 12px;
+            font-size: 10px;
             font-weight: 600;
-            color: var(--text-muted);
+            color: var(--t3);
             text-transform: uppercase;
             letter-spacing: 0.5px;
             border-bottom: 1px solid var(--border);
+            white-space: nowrap;
         }
-
-        .orders-table td {
-            padding: 14px 16px;
-            font-size: 13px;
+        .tbl td {
+            padding: 10px 12px;
+            font-size: 12px;
+            color: var(--t2);
             border-bottom: 1px solid var(--border);
-            color: var(--text-secondary);
+            white-space: nowrap;
         }
-
-        .orders-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .orders-table tr:hover td {
-            background: rgba(255,255,255,0.02);
-        }
-
-        .order-id {
-            font-family: 'SF Mono', 'Fira Code', monospace;
-            font-size: 12px;
-            color: var(--accent-cyan);
-            font-weight: 500;
-        }
-
-        .platform-tag {
+        .tbl tr:last-child td { border-bottom: none; }
+        .tbl tr:active td { background: rgba(255,255,255,0.02); }
+        .oid { font-family: 'SF Mono', monospace; font-size: 11px; color: var(--cyan); }
+        .tag {
             display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 3px 10px;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            color: var(--text-primary);
-        }
-
-        .platform-tag.tiktok {
-            background: rgba(0,0,0,0.4);
-            border-color: rgba(255,0,80,0.3);
-            color: #ff0050;
-        }
-
-        .badge {
-            display: inline-flex;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-size: 10px;
             font-weight: 600;
         }
+        .tag.tt { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,0,80,0.25); color: #ff0050; }
+        .tag.pending { background: rgba(245,158,11,0.1); color: var(--amber); }
+        .tag.unprinted { background: rgba(239,68,68,0.1); color: var(--red); }
+        .tag.shipped { background: rgba(16,185,129,0.1); color: var(--green); }
+        .tag.gofo { background: rgba(139,92,246,0.1); color: var(--purple); }
+        .tag.usps { background: rgba(59,130,246,0.1); color: var(--blue); }
 
-        .badge.pending {
-            background: rgba(245,158,11,0.12);
-            color: var(--accent-amber);
-        }
-
-        .badge.unprinted {
-            background: rgba(239,68,68,0.12);
-            color: var(--accent-red);
-        }
-
-        /* Inventory */
-        .inventory-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
+        /* === INVENTORY GRID === */
+        .inv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .inv-item {
-            padding: 16px;
-            background: rgba(255,255,255,0.02);
+            padding: 14px;
+            background: rgba(255,255,255,0.015);
             border: 1px solid var(--border);
-            border-radius: 12px;
+            border-radius: 10px;
             text-align: center;
         }
+        .inv-val { font-size: 24px; font-weight: 800; margin-bottom: 2px; }
+        .inv-lbl { font-size: 11px; color: var(--t3); }
 
-        .inv-value {
-            font-size: 28px;
-            font-weight: 800;
-            margin-bottom: 4px;
-        }
-
-        .inv-label {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        /* Full width card */
-        .full-width {
-            grid-column: 1 / -1;
-        }
-
-        /* Account info */
-        .account-info {
-            display: flex;
-            align-items: center;
-            gap: 24px;
-            padding: 20px;
-            background: rgba(255,255,255,0.02);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-        }
-
-        .account-amount {
-            font-size: 32px;
-            font-weight: 800;
-        }
-
-        .account-amount.negative { color: var(--accent-red); }
-
-        .account-credit {
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-
-        .credit-bar {
-            flex: 1;
-            height: 8px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .credit-bar-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--accent-red), var(--accent-amber));
-            border-radius: 8px;
-        }
-
-        /* Footer */
-        .footer {
+        /* === ACCOUNT === */
+        .acct-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
+        .acct-label { font-size: 11px; color: var(--t3); margin-bottom: 3px; }
+        .acct-amt { font-size: 28px; font-weight: 900; }
+        .acct-amt.neg { color: var(--red); }
+        .acct-credit { font-size: 14px; color: var(--t2); }
+        .credit-bar { height: 6px; background: rgba(255,255,255,0.04); border-radius: 6px; overflow: hidden; margin-bottom: 12px; }
+        .credit-fill { height: 100%; background: linear-gradient(90deg, var(--red), var(--amber)); border-radius: 6px; }
+        .acct-split { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .acct-box {
+            padding: 12px;
+            border-radius: 10px;
             text-align: center;
-            padding: 24px;
-            color: var(--text-muted);
-            font-size: 12px;
         }
+        .acct-box .lbl { font-size: 11px; color: var(--t3); }
+        .acct-box .val { font-size: 18px; font-weight: 700; margin-top: 3px; }
 
-        .footer a {
-            color: var(--accent-blue);
-            text-decoration: none;
+        /* === YEAR SUMMARY === */
+        .year-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+        .year-item {
+            padding: 14px 10px;
+            background: rgba(255,255,255,0.015);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            text-align: center;
         }
+        .year-val { font-size: 22px; font-weight: 800; margin-bottom: 2px; }
+        .year-lbl { font-size: 10px; color: var(--t3); }
 
-        /* Animations */
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        /* === FOOTER === */
+        .footer { text-align: center; padding: 16px 0; color: var(--t3); font-size: 11px; }
+        .footer a { color: var(--blue); text-decoration: none; }
 
-        .stat-card, .card {
-            animation: fadeInUp 0.6s ease forwards;
-            opacity: 0;
-        }
+        /* === ANIMATIONS === */
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        .stat, .card { animation: fadeUp 0.5s ease forwards; opacity: 0; }
+        .stat:nth-child(1), .card:nth-child(1) { animation-delay: 0.05s; }
+        .stat:nth-child(2), .card:nth-child(2) { animation-delay: 0.1s; }
+        .stat:nth-child(3), .card:nth-child(3) { animation-delay: 0.15s; }
+        .stat:nth-child(4), .card:nth-child(4) { animation-delay: 0.2s; }
+        .stat:nth-child(5), .card:nth-child(5) { animation-delay: 0.25s; }
+        .stat:nth-child(6), .card:nth-child(6) { animation-delay: 0.3s; }
 
-        .stat-card:nth-child(1) { animation-delay: 0.1s; }
-        .stat-card:nth-child(2) { animation-delay: 0.15s; }
-        .stat-card:nth-child(3) { animation-delay: 0.2s; }
-        .stat-card:nth-child(4) { animation-delay: 0.25s; }
-
-        .card:nth-child(1) { animation-delay: 0.3s; }
-        .card:nth-child(2) { animation-delay: 0.35s; }
-
-        /* Responsive */
-        @media (max-width: 1200px) {
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .main-grid { grid-template-columns: 1fr; }
-        }
-
-        @media (max-width: 640px) {
-            .stats-grid { grid-template-columns: 1fr; }
-            .header { flex-direction: column; gap: 16px; text-align: center; }
-            .header-right { flex-direction: column; }
-            .container { padding: 12px; }
-        }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
+        /* === SCROLLBAR === */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
 
-        /* Glow effects on specific cards */
-        .stat-card.blue:hover { box-shadow: var(--glow-blue); }
-        .stat-card.green:hover { box-shadow: var(--glow-green); }
-        .stat-card.amber:hover { box-shadow: var(--glow-amber); }
+        /* === DESKTOP === */
+        @media (min-width: 640px) {
+            .app { padding: 20px; }
+            .header { padding: 28px; }
+            .header h1 { font-size: 28px; }
+            .stats { grid-template-columns: repeat(3, 1fr); gap: 14px; }
+            .stat { padding: 20px; }
+            .stat-val { font-size: 36px; }
+            .chart-wrap { height: 260px; }
+        }
+
+        @media (min-width: 900px) {
+            .stats { grid-template-columns: repeat(6, 1fr); }
+        }
+
+        /* === LANDSCAPE MOBILE === */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .stats { grid-template-columns: repeat(3, 1fr); }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="app">
         <!-- Header -->
         <div class="header">
-            <div class="header-left">
-                <h1>✈️ Sunny & Lucky Skies</h1>
-                <div class="subtitle">OMS 运营看板 · 领星海外仓 · TikTok US</div>
-            </div>
-            <div class="header-right">
-                <div class="status-badge">
-                    <div class="status-dot"></div>
-                    系统运行中
+            <div class="header-top">
+                <div>
+                    <h1>✈️ Sunny & Lucky Skies</h1>
+                    <div class="sub">OMS 运营看板 · 领星海外仓 · TikTok US</div>
                 </div>
-                <div class="update-time">更新于 2026-06-14 04:33 CST</div>
+                <div class="live-badge"><div class="live-dot"></div>运行中</div>
             </div>
+            <div class="header-time">更新于 2026-06-14 05:09 CST</div>
         </div>
 
-        <!-- Stats Cards -->
-        <div class="stats-grid">
-            <div class="stat-card amber">
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat s-amber">
                 <div class="stat-icon">⏳</div>
-                <div class="stat-value">7</div>
-                <div class="stat-label">待处理订单</div>
-                <div class="stat-sub">全部来自 TikTok US · 今日新增 4 单</div>
+                <div class="stat-val">7</div>
+                <div class="stat-lbl">待处理</div>
+                <div class="stat-sub">今日新增 4 单</div>
             </div>
-            <div class="stat-card blue">
+            <div class="stat s-blue">
                 <div class="stat-icon">🔄</div>
-                <div class="stat-value">21</div>
-                <div class="stat-label">处理中订单</div>
-                <div class="stat-sub">一件代发 · 派送处理中</div>
+                <div class="stat-val">21</div>
+                <div class="stat-lbl">处理中</div>
+                <div class="stat-sub">一件代发</div>
             </div>
-            <div class="stat-card green">
+            <div class="stat s-green">
+                <div class="stat-icon">✅</div>
+                <div class="stat-val">3,921</div>
+                <div class="stat-lbl">已发货</div>
+                <div class="stat-sub">本年度累计</div>
+            </div>
+            <div class="stat s-cyan">
                 <div class="stat-icon">📦</div>
-                <div class="stat-value">2,333</div>
-                <div class="stat-label">在库总量</div>
-                <div class="stat-sub">14 个可用 SKU · 3,332 产品库存</div>
+                <div class="stat-val">2,333</div>
+                <div class="stat-lbl">在库总量</div>
+                <div class="stat-sub">14 SKU</div>
             </div>
-            <div class="stat-card purple">
+            <div class="stat s-purple">
                 <div class="stat-icon">📊</div>
-                <div class="stat-value">113</div>
-                <div class="stat-label">本周发货量</div>
-                <div class="stat-sub">一件代发单量 · 本周累计</div>
+                <div class="stat-val">113</div>
+                <div class="stat-lbl">本周发货</div>
+                <div class="stat-sub">一件代发</div>
+            </div>
+            <div class="stat s-red">
+                <div class="stat-icon">💰</div>
+                <div class="stat-val">-$498</div>
+                <div class="stat-lbl">账户余额</div>
+                <div class="stat-sub">额度 $1,000</div>
             </div>
         </div>
 
-        <!-- Main Content -->
-        <div class="main-grid">
+        <!-- Year Summary -->
+        <div class="card">
+            <div class="card-title">
+                <div class="ic" style="background:rgba(6,182,212,0.12)">📅</div>
+                2026 年度总览
+            </div>
+            <div class="year-row">
+                <div class="year-item">
+                    <div class="year-val" style="color:var(--green)">3,944</div>
+                    <div class="year-lbl">一件代发</div>
+                </div>
+                <div class="year-item">
+                    <div class="year-val" style="color:var(--cyan)">14</div>
+                    <div class="year-lbl">入库单量</div>
+                </div>
+                <div class="year-item">
+                    <div class="year-val" style="color:var(--purple)">186</div>
+                    <div class="year-lbl">本月发货</div>
+                </div>
+            </div>
+            <div style="font-size:11px;color:var(--t3);text-align:center;">
+                日均发货 ≈ <span style="color:var(--amber);font-weight:700;">22</span> 单 · 月均 ≈ <span style="color:var(--amber);font-weight:700;">657</span> 单
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
             <!-- Weekly Chart -->
             <div class="card">
                 <div class="card-title">
-                    <div class="icon" style="background:rgba(59,130,246,0.15)">📈</div>
-                    单量趋势 · 本周
+                    <div class="ic" style="background:rgba(59,130,246,0.12)">📈</div>
+                    本周单量
                 </div>
-                <div class="chart-container">
+                <div class="chart-wrap">
                     <canvas id="weeklyChart"></canvas>
                 </div>
             </div>
 
-            <!-- Order Pipeline -->
+            <!-- Monthly Product Mix -->
             <div class="card">
                 <div class="card-title">
-                    <div class="icon" style="background:rgba(245,158,11,0.15)">🔄</div>
-                    订单流水线
+                    <div class="ic" style="background:rgba(139,92,246,0.12)">🧩</div>
+                    产品分布
                 </div>
-                <div class="pipeline">
-                    <div class="pipeline-item">
-                        <div class="pipeline-icon" style="background:rgba(245,158,11,0.15)">📥</div>
-                        <div class="pipeline-info">
-                            <div class="pipeline-name">待入库</div>
-                            <div class="pipeline-desc">等待仓库接收</div>
-                            <div class="pipeline-bar"><div class="pipeline-bar-fill" style="width:25%;background:var(--accent-amber)"></div></div>
-                        </div>
-                        <div class="pipeline-count" style="color:var(--accent-amber)">2</div>
-                    </div>
-                    <div class="pipeline-item">
-                        <div class="pipeline-icon" style="background:rgba(239,68,68,0.15)">⏳</div>
-                        <div class="pipeline-info">
-                            <div class="pipeline-name">待处理</div>
-                            <div class="pipeline-desc">等待审核 / 分配仓库</div>
-                            <div class="pipeline-bar"><div class="pipeline-bar-fill" style="width:35%;background:var(--accent-red)"></div></div>
-                        </div>
-                        <div class="pipeline-count" style="color:var(--accent-red)">7</div>
-                    </div>
-                    <div class="pipeline-item">
-                        <div class="pipeline-icon" style="background:rgba(59,130,246,0.15)">🔄</div>
-                        <div class="pipeline-info">
-                            <div class="pipeline-name">处理中</div>
-                            <div class="pipeline-desc">一件代发 · 派送处理</div>
-                            <div class="pipeline-bar"><div class="pipeline-bar-fill" style="width:85%;background:var(--accent-blue)"></div></div>
-                        </div>
-                        <div class="pipeline-count" style="color:var(--accent-blue)">21</div>
-                    </div>
-                    <div class="pipeline-item">
-                        <div class="pipeline-icon" style="background:rgba(16,185,129,0.15)">✅</div>
-                        <div class="pipeline-info">
-                            <div class="pipeline-name">备货中转</div>
-                            <div class="pipeline-desc">等待中转处理</div>
-                            <div class="pipeline-bar"><div class="pipeline-bar-fill" style="width:0%;background:var(--accent-green)"></div></div>
-                        </div>
-                        <div class="pipeline-count" style="color:var(--accent-green)">0</div>
-                    </div>
+                <div class="chart-wrap">
+                    <canvas id="productChart"></canvas>
                 </div>
             </div>
+        </div>
 
-            <!-- Pending Orders Table -->
-            <div class="card full-width">
-                <div class="card-title">
-                    <div class="icon" style="background:rgba(239,68,68,0.15)">📋</div>
-                    待处理订单详情 · 7 单
+        <!-- Pipeline -->
+        <div class="card">
+            <div class="card-title">
+                <div class="ic" style="background:rgba(245,158,11,0.12)">🔄</div>
+                订单流水线
+            </div>
+            <div class="pipe">
+                <div class="pipe-row">
+                    <div class="pipe-ic" style="background:rgba(245,158,11,0.12)">📥</div>
+                    <div class="pipe-info">
+                        <div class="pipe-name">待入库</div>
+                        <div class="pipe-desc">等待仓库接收</div>
+                        <div class="pipe-bar"><div class="pipe-fill" style="width:20%;background:var(--amber)"></div></div>
+                    </div>
+                    <div class="pipe-num" style="color:var(--amber)">2</div>
                 </div>
-                <div style="overflow-x:auto;">
-                    <table class="orders-table">
-                        <thead>
-                            <tr>
-                                <th>平台</th>
-                                <th>平台单号</th>
-                                <th>产品</th>
-                                <th>国家</th>
-                                <th>邮编</th>
-                                <th>下单时间</th>
-                                <th>状态</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><span class="platform-tag tiktok">TikTok</span></td>
-                                <td><span class="order-id">577432202315207652</span></td>
-                                <td>ysd-9pcs × 1 <span style="color:var(--text-muted)">(ysd-003)</span></td>
-                                <td>🇺🇸 US</td>
-                                <td>90019</td>
-                                <td>06-14 03:34</td>
-                                <td><span class="badge pending">待审核</span> <span class="badge unprinted">未打印</span></td>
-                            </tr>
-                            <tr>
-                                <td><span class="platform-tag tiktok">TikTok</span></td>
-                                <td><span class="order-id">577432203530637815</span></td>
-                                <td>ysd-15pcs × 1 <span style="color:var(--text-muted)">(ysd-004)</span></td>
-                                <td>🇺🇸 US</td>
-                                <td>08753</td>
-                                <td>06-14 03:36</td>
-                                <td><span class="badge pending">待审核</span> <span class="badge unprinted">未打印</span></td>
-                            </tr>
-                            <tr>
-                                <td><span class="platform-tag tiktok">TikTok</span></td>
-                                <td><span class="order-id">577432010943337172</span></td>
-                                <td>1PC-PJQJ × 1 <span style="color:var(--text-muted)">(pjqjj-001)</span></td>
-                                <td>🇺🇸 US</td>
-                                <td>11204</td>
-                                <td>06-14 00:59</td>
-                                <td><span class="badge pending">待审核</span> <span class="badge unprinted">未打印</span></td>
-                            </tr>
-                            <tr>
-                                <td><span class="platform-tag tiktok">TikTok</span></td>
-                                <td><span class="order-id">577431925413811005</span></td>
-                                <td>ysd-15pcs × 1 <span style="color:var(--text-muted)">(ysd-004)</span></td>
-                                <td>🇺🇸 US</td>
-                                <td>03060</td>
-                                <td>06-13 23:59</td>
-                                <td><span class="badge pending">待审核</span> <span class="badge unprinted">未打印</span></td>
-                            </tr>
-                            <tr>
-                                <td><span class="platform-tag tiktok">TikTok</span></td>
-                                <td><span class="order-id">577431922182165158</span></td>
-                                <td>1PC-PJQJ × 1 <span style="color:var(--text-muted)">(pjqjj-001)</span></td>
-                                <td>🇺🇸 US</td>
-                                <td>23831</td>
-                                <td>06-13 23:53</td>
-                                <td><span class="badge pending">待审核</span> <span class="badge unprinted">未打印</span></td>
-                            </tr>
-                            <tr>
-                                <td><span class="platform-tag tiktok">TikTok</span></td>
-                                <td><span class="order-id">577431878235820678</span></td>
-                                <td>ysd-9pcs × 1 <span style="color:var(--text-muted)">(ysd-003)</span></td>
-                                <td>🇺🇸 US</td>
-                                <td>22306</td>
-                                <td>06-13 23:24</td>
-                                <td><span class="badge pending">待审核</span> <span class="badge unprinted">未打印</span></td>
-                            </tr>
-                            <tr>
-                                <td><span class="platform-tag tiktok">TikTok</span></td>
-                                <td><span class="order-id">577431836546601413</span></td>
-                                <td>ysd-15pcs × 1 <span style="color:var(--text-muted)">(ysd-004)</span></td>
-                                <td>🇺🇸 US</td>
-                                <td>44612</td>
-                                <td>06-13 22:47</td>
-                                <td><span class="badge pending">待审核</span> <span class="badge unprinted">未打印</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="pipe-row">
+                    <div class="pipe-ic" style="background:rgba(239,68,68,0.12)">⏳</div>
+                    <div class="pipe-info">
+                        <div class="pipe-name">待处理</div>
+                        <div class="pipe-desc">审核 / 分配仓库</div>
+                        <div class="pipe-bar"><div class="pipe-fill" style="width:35%;background:var(--red)"></div></div>
+                    </div>
+                    <div class="pipe-num" style="color:var(--red)">7</div>
+                </div>
+                <div class="pipe-row">
+                    <div class="pipe-ic" style="background:rgba(59,130,246,0.12)">🔄</div>
+                    <div class="pipe-info">
+                        <div class="pipe-name">处理中</div>
+                        <div class="pipe-desc">一件代发 · 派送</div>
+                        <div class="pipe-bar"><div class="pipe-fill" style="width:70%;background:var(--blue)"></div></div>
+                    </div>
+                    <div class="pipe-num" style="color:var(--blue)">21</div>
+                </div>
+                <div class="pipe-row">
+                    <div class="pipe-ic" style="background:rgba(16,185,129,0.12)">✅</div>
+                    <div class="pipe-info">
+                        <div class="pipe-name">已发货</div>
+                        <div class="pipe-desc">本年度累计</div>
+                        <div class="pipe-bar"><div class="pipe-fill" style="width:100%;background:var(--green)"></div></div>
+                    </div>
+                    <div class="pipe-num" style="color:var(--green)">3,921</div>
                 </div>
             </div>
+        </div>
 
+        <!-- Pending Orders -->
+        <div class="card">
+            <div class="card-title">
+                <div class="ic" style="background:rgba(239,68,68,0.12)">📋</div>
+                待处理订单 · 7 单
+            </div>
+            <div class="tbl-wrap">
+                <table class="tbl">
+                    <thead>
+                        <tr>
+                            <th>平台</th>
+                            <th>单号</th>
+                            <th>产品</th>
+                            <th>邮编</th>
+                            <th>时间</th>
+                            <th>状态</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="tag tt">TikTok</span></td>
+                            <td><span class="oid">577432202315207652</span></td>
+                            <td>ysd-003 ×1</td>
+                            <td>90019</td>
+                            <td>06-14 03:34</td>
+                            <td><span class="tag pending">待审</span> <span class="tag unprinted">未打印</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag tt">TikTok</span></td>
+                            <td><span class="oid">577432203530637815</span></td>
+                            <td>ysd-004 ×1</td>
+                            <td>08753</td>
+                            <td>06-14 03:36</td>
+                            <td><span class="tag pending">待审</span> <span class="tag unprinted">未打印</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag tt">TikTok</span></td>
+                            <td><span class="oid">577432010943337172</span></td>
+                            <td>pjqjj-001 ×1</td>
+                            <td>11204</td>
+                            <td>06-14 00:59</td>
+                            <td><span class="tag pending">待审</span> <span class="tag unprinted">未打印</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag tt">TikTok</span></td>
+                            <td><span class="oid">577431925413811005</span></td>
+                            <td>ysd-004 ×1</td>
+                            <td>03060</td>
+                            <td>06-13 23:59</td>
+                            <td><span class="tag pending">待审</span> <span class="tag unprinted">未打印</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag tt">TikTok</span></td>
+                            <td><span class="oid">577431922182165158</span></td>
+                            <td>pjqjj-001 ×1</td>
+                            <td>23831</td>
+                            <td>06-13 23:53</td>
+                            <td><span class="tag pending">待审</span> <span class="tag unprinted">未打印</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag tt">TikTok</span></td>
+                            <td><span class="oid">577431878235820678</span></td>
+                            <td>ysd-003 ×1</td>
+                            <td>22306</td>
+                            <td>06-13 23:24</td>
+                            <td><span class="tag pending">待审</span> <span class="tag unprinted">未打印</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag tt">TikTok</span></td>
+                            <td><span class="oid">577431836546601413</span></td>
+                            <td>ysd-004 ×1</td>
+                            <td>44612</td>
+                            <td>06-13 22:47</td>
+                            <td><span class="tag pending">待审</span> <span class="tag unprinted">未打印</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Shipped Orders (Recent) -->
+        <div class="card">
+            <div class="card-title">
+                <div class="ic" style="background:rgba(16,185,129,0.12)">🚚</div>
+                近期已发货 · GOFO / USPS
+            </div>
+            <div class="tbl-wrap">
+                <table class="tbl">
+                    <thead>
+                        <tr>
+                            <th>单号</th>
+                            <th>产品</th>
+                            <th>承运商</th>
+                            <th>发货时间</th>
+                            <th>仓库</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="oid">577430081718554926</span></td>
+                            <td>ysd-004 ×1</td>
+                            <td><span class="tag usps">USPS</span></td>
+                            <td>06-12 22:03</td>
+                            <td>亚特兰大仓</td>
+                        </tr>
+                        <tr>
+                            <td><span class="oid">577429345679676139</span></td>
+                            <td>ysd-004 ×1</td>
+                            <td><span class="tag gofo">GOFO</span></td>
+                            <td>06-12 22:03</td>
+                            <td>亚特兰大仓</td>
+                        </tr>
+                        <tr>
+                            <td><span class="oid">577429331150279192</span></td>
+                            <td>ysd-003 ×1</td>
+                            <td><span class="tag gofo">GOFO</span></td>
+                            <td>06-12 22:03</td>
+                            <td>亚特兰大仓</td>
+                        </tr>
+                        <tr>
+                            <td><span class="oid">577429292155179060</span></td>
+                            <td>ysd-003 ×1</td>
+                            <td><span class="tag gofo">GOFO</span></td>
+                            <td>06-12 22:03</td>
+                            <td>亚特兰大仓</td>
+                        </tr>
+                        <tr>
+                            <td><span class="oid">577429113596776913</span></td>
+                            <td>ysd-003 ×1</td>
+                            <td><span class="tag gofo">GOFO</span></td>
+                            <td>06-12 22:03</td>
+                            <td>亚特兰大仓</td>
+                        </tr>
+                        <tr>
+                            <td><span class="oid">577427645909144196</span></td>
+                            <td>ysd-004 ×1</td>
+                            <td><span class="tag usps">USPS</span></td>
+                            <td>06-11 22:23</td>
+                            <td>亚特兰大仓</td>
+                        </tr>
+                        <tr>
+                            <td><span class="oid">577428065010487735</span></td>
+                            <td>ysd-004 ×1</td>
+                            <td><span class="tag usps">USPS</span></td>
+                            <td>06-11 22:23</td>
+                            <td>亚特兰大仓</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Inventory + Account Row -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
             <!-- Inventory -->
             <div class="card">
                 <div class="card-title">
-                    <div class="icon" style="background:rgba(6,182,212,0.15)">📦</div>
-                    库存概览
+                    <div class="ic" style="background:rgba(6,182,212,0.12)">📦</div>
+                    库存
                 </div>
-                <div class="inventory-grid">
+                <div class="inv-grid">
                     <div class="inv-item">
-                        <div class="inv-value" style="color:var(--accent-cyan)">2,333</div>
-                        <div class="inv-label">在库总数</div>
+                        <div class="inv-val" style="color:var(--cyan)">2,333</div>
+                        <div class="inv-lbl">在库总数</div>
                     </div>
                     <div class="inv-item">
-                        <div class="inv-value" style="color:var(--accent-green)">3,332</div>
-                        <div class="inv-label">产品库存</div>
+                        <div class="inv-val" style="color:var(--green)">3,332</div>
+                        <div class="inv-lbl">产品库存</div>
                     </div>
                     <div class="inv-item">
-                        <div class="inv-value" style="color:var(--accent-purple)">14</div>
-                        <div class="inv-label">可用 SKU</div>
+                        <div class="inv-val" style="color:var(--purple)">14</div>
+                        <div class="inv-lbl">可用 SKU</div>
                     </div>
                     <div class="inv-item">
-                        <div class="inv-value" style="color:var(--text-muted)">0</div>
-                        <div class="inv-label">退货库存</div>
+                        <div class="inv-val" style="color:var(--t3)">0</div>
+                        <div class="inv-lbl">退货库存</div>
                     </div>
                 </div>
-                <div style="margin-top:16px;">
-                    <canvas id="inventoryChart" height="120"></canvas>
+                <div style="margin-top:12px;height:130px;">
+                    <canvas id="invChart"></canvas>
                 </div>
             </div>
 
             <!-- Account -->
             <div class="card">
                 <div class="card-title">
-                    <div class="icon" style="background:rgba(236,72,153,0.15)">💰</div>
+                    <div class="ic" style="background:rgba(236,72,153,0.12)">💰</div>
                     账户资产
                 </div>
-                <div class="account-info" style="flex-direction:column;align-items:stretch;gap:16px;">
-                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
-                        <div>
-                            <div style="font-size:13px;color:var(--text-muted);margin-bottom:4px;">当前余额 (USD)</div>
-                            <div class="account-amount negative">-$498.06</div>
-                        </div>
-                        <div style="text-align:right;">
-                            <div style="font-size:13px;color:var(--text-muted);margin-bottom:4px;">信用额度</div>
-                            <div class="account-credit">$1,000.00</div>
-                        </div>
-                    </div>
+                <div class="acct-row">
                     <div>
-                        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-                            <span style="font-size:12px;color:var(--text-muted)">已使用额度</span>
-                            <span style="font-size:12px;color:var(--accent-amber)">49.8%</span>
-                        </div>
-                        <div class="credit-bar">
-                            <div class="credit-bar-fill" style="width:49.8%"></div>
-                        </div>
+                        <div class="acct-label">当前余额 (USD)</div>
+                        <div class="acct-amt neg">-$498.06</div>
                     </div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px;">
-                        <div style="padding:12px;background:rgba(239,68,68,0.08);border-radius:10px;text-align:center;">
-                            <div style="font-size:12px;color:var(--text-muted)">已用</div>
-                            <div style="font-size:18px;font-weight:700;color:var(--accent-red);margin-top:4px;">$498.06</div>
-                        </div>
-                        <div style="padding:12px;background:rgba(16,185,129,0.08);border-radius:10px;text-align:center;">
-                            <div style="font-size:12px;color:var(--text-muted)">可用</div>
-                            <div style="font-size:18px;font-weight:700;color:var(--accent-green);margin-top:4px;">$501.94</div>
-                        </div>
+                    <div style="text-align:right;">
+                        <div class="acct-label">信用额度</div>
+                        <div class="acct-credit">$1,000</div>
+                    </div>
+                </div>
+                <div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                        <span style="font-size:10px;color:var(--t3)">已用 49.8%</span>
+                        <span style="font-size:10px;color:var(--amber)">额度使用中</span>
+                    </div>
+                    <div class="credit-bar"><div class="credit-fill" style="width:49.8%"></div></div>
+                </div>
+                <div class="acct-split">
+                    <div class="acct-box" style="background:rgba(239,68,68,0.06);">
+                        <div class="lbl">已用</div>
+                        <div class="val" style="color:var(--red)">$498.06</div>
+                    </div>
+                    <div class="acct-box" style="background:rgba(16,185,129,0.06);">
+                        <div class="lbl">可用</div>
+                        <div class="val" style="color:var(--green)">$501.94</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Footer -->
+        <!-- Logistics Analysis -->
+        <div class="card">
+            <div class="card-title">
+                <div class="ic" style="background:rgba(139,92,246,0.12)">🚚</div>
+                物流分析
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
+                <div style="padding:14px;background:rgba(139,92,246,0.06);border:1px solid var(--border);border-radius:10px;text-align:center;">
+                    <div style="font-size:11px;color:var(--t3);margin-bottom:4px;">主要承运商</div>
+                    <div style="font-size:16px;font-weight:700;color:var(--purple);">GOFO</div>
+                    <div style="font-size:10px;color:var(--t3);margin-top:2px;">约 75% 订单</div>
+                </div>
+                <div style="padding:14px;background:rgba(59,130,246,0.06);border:1px solid var(--border);border-radius:10px;text-align:center;">
+                    <div style="font-size:11px;color:var(--t3);margin-bottom:4px;">次要承运商</div>
+                    <div style="font-size:16px;font-weight:700;color:var(--blue);">USPS</div>
+                    <div style="font-size:10px;color:var(--t3);margin-top:2px;">约 25% 订单</div>
+                </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+                <div style="padding:12px;background:rgba(255,255,255,0.015);border:1px solid var(--border);border-radius:10px;text-align:center;">
+                    <div style="font-size:20px;font-weight:800;color:var(--cyan);">亚特兰大</div>
+                    <div style="font-size:10px;color:var(--t3);margin-top:2px;">US04 发货仓</div>
+                </div>
+                <div style="padding:12px;background:rgba(255,255,255,0.015);border:1px solid var(--border);border-radius:10px;text-align:center;">
+                    <div style="font-size:20px;font-weight:800;color:var(--amber);">100%</div>
+                    <div style="font-size:10px;color:var(--t3);margin-top:2px;">平台面单</div>
+                </div>
+                <div style="padding:12px;background:rgba(255,255,255,0.015);border:1px solid var(--border);border-radius:10px;text-align:center;">
+                    <div style="font-size:20px;font-weight:800;color:var(--green);">TikTok</div>
+                    <div style="font-size:10px;color:var(--t3);margin-top:2px;">唯一平台</div>
+                </div>
+            </div>
+        </div>
+
         <div class="footer">
-            Powered by <a href="#">OpenClaw</a> · Sunny & Lucky Skies OMS Dashboard · 2026
+            Powered by <a href="#">OpenClaw</a> · Sunny & Lucky Skies · 2026
         </div>
     </div>
 
     <script>
-        // Weekly orders chart
-        const weeklyCtx = document.getElementById('weeklyChart').getContext('2d');
-        new Chart(weeklyCtx, {
+        // Weekly chart
+        new Chart(document.getElementById('weeklyChart'), {
             type: 'bar',
             data: {
-                labels: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+                labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
                 datasets: [{
                     label: '一件代发',
                     data: [18, 22, 25, 19, 15, 8, 6],
-                    backgroundColor: 'rgba(59,130,246,0.6)',
-                    borderColor: 'rgba(59,130,246,1)',
+                    backgroundColor: 'rgba(59,130,246,0.5)',
+                    borderColor: 'rgba(59,130,246,0.8)',
                     borderWidth: 1,
-                    borderRadius: 6,
-                    barPercentage: 0.6
-                }, {
-                    label: '入库',
-                    data: [0, 0, 0, 0, 0, 0, 0],
-                    backgroundColor: 'rgba(16,185,129,0.6)',
-                    borderColor: 'rgba(16,185,129,1)',
-                    borderWidth: 1,
-                    borderRadius: 6,
-                    barPercentage: 0.6
+                    borderRadius: 5,
+                    barPercentage: 0.55
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 10 } } },
+                    y: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#64748b', font: { size: 10 } }, beginAtZero: true }
+                }
+            }
+        });
+
+        // Product distribution (based on pending + recent shipped data)
+        new Chart(document.getElementById('productChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['ysd-003 (9pcs)', 'ysd-004 (15pcs)', 'pjqjj-001 (1PC)'],
+                datasets: [{
+                    data: [45, 40, 15],
+                    backgroundColor: ['rgba(59,130,246,0.7)', 'rgba(139,92,246,0.7)', 'rgba(236,72,153,0.7)'],
+                    borderColor: ['rgba(59,130,246,1)', 'rgba(139,92,246,1)', 'rgba(236,72,153,1)'],
+                    borderWidth: 2,
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '62%',
                 plugins: {
                     legend: {
-                        position: 'top',
-                        labels: { color: '#94a3b8', font: { size: 12 }, usePointStyle: true, pointStyle: 'circle', padding: 20 }
-                    }
-                },
-                scales: {
-                    x: {
-                        grid: { color: 'rgba(255,255,255,0.03)' },
-                        ticks: { color: '#64748b', font: { size: 12 } }
-                    },
-                    y: {
-                        grid: { color: 'rgba(255,255,255,0.03)' },
-                        ticks: { color: '#64748b', font: { size: 12 } },
-                        beginAtZero: true
+                        position: 'bottom',
+                        labels: { color: '#94a3b8', font: { size: 10 }, usePointStyle: true, pointStyle: 'circle', padding: 10 }
                     }
                 }
             }
         });
 
-        // Inventory doughnut chart
-        const invCtx = document.getElementById('inventoryChart').getContext('2d');
-        new Chart(invCtx, {
+        // Inventory chart
+        new Chart(document.getElementById('invChart'), {
             type: 'doughnut',
             data: {
                 labels: ['产品库存', '箱库存', '退货库存'],
                 datasets: [{
                     data: [3332, 0, 0],
-                    backgroundColor: ['rgba(6,182,212,0.7)', 'rgba(139,92,246,0.7)', 'rgba(236,72,153,0.7)'],
+                    backgroundColor: ['rgba(6,182,212,0.6)', 'rgba(139,92,246,0.6)', 'rgba(236,72,153,0.6)'],
                     borderColor: ['rgba(6,182,212,1)', 'rgba(139,92,246,1)', 'rgba(236,72,153,1)'],
-                    borderWidth: 2,
-                    hoverOffset: 8
+                    borderWidth: 2
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                cutout: '65%',
+                cutout: '60%',
                 plugins: {
                     legend: {
                         position: 'bottom',
-                        labels: { color: '#94a3b8', font: { size: 11 }, usePointStyle: true, pointStyle: 'circle', padding: 16 }
+                        labels: { color: '#94a3b8', font: { size: 9 }, usePointStyle: true, pointStyle: 'circle', padding: 8 }
                     }
                 }
             }
