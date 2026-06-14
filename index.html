@@ -1,791 +1,247 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sunny & Lucky Skies - OMS 看板</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>SLS OMS 看板</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+:root{--bg:#06080f;--card:#111827;--card2:#1a2235;--border:rgba(255,255,255,0.05);--blue:#3b82f6;--cyan:#06b6d4;--green:#10b981;--amber:#f59e0b;--red:#ef4444;--purple:#8b5cf6;--pink:#ec4899;--t1:#f1f5f9;--t2:#94a3b8;--t3:#64748b}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',-apple-system,system-ui,sans-serif;background:var(--bg);color:var(--t1);-webkit-font-smoothing:antialiased;min-height:100vh}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 50% 40% at 15% 5%,rgba(59,130,246,0.07) 0%,transparent 50%),radial-gradient(ellipse 40% 40% at 85% 95%,rgba(139,92,246,0.05) 0%,transparent 50%);pointer-events:none}
+.app{position:relative;z-index:1;padding:12px;max-width:900px;margin:0 auto}
 
-        :root {
-            --bg: #06080f;
-            --bg2: #0c1021;
-            --card: #111827;
-            --card2: #1a2235;
-            --border: rgba(255,255,255,0.05);
-            --blue: #3b82f6;
-            --cyan: #06b6d4;
-            --green: #10b981;
-            --amber: #f59e0b;
-            --red: #ef4444;
-            --purple: #8b5cf6;
-            --pink: #ec4899;
-            --t1: #f1f5f9;
-            --t2: #94a3b8;
-            --t3: #64748b;
-        }
+/* Header */
+.hdr{background:linear-gradient(135deg,var(--card) 0%,rgba(59,130,246,0.06) 100%);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:12px}
+.hdr-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.hdr h1{font-size:22px;font-weight:800;background:linear-gradient(135deg,#fff,var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1.2}
+.hdr .sub{color:var(--t2);font-size:12px;margin-top:4px}
+.live{display:flex;align-items:center;gap:6px;padding:5px 12px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);border-radius:100px;font-size:11px;color:var(--green);white-space:nowrap;flex-shrink:0}
+.dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:p 2s infinite}
+@keyframes p{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,0.4)}50%{box-shadow:0 0 0 6px rgba(16,185,129,0)}}
+.hdr-time{font-size:11px;color:var(--t3);margin-top:10px}
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+/* Stats */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.s{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;position:relative;overflow:hidden;transition:transform .2s}
+.s:active{transform:scale(.97)}
+.s::before{content:'';position:absolute;top:0;left:0;right:0;height:2.5px}
+.s.a::before{background:linear-gradient(90deg,var(--amber),var(--red))}
+.s.b::before{background:linear-gradient(90deg,var(--blue),var(--cyan))}
+.s.g::before{background:linear-gradient(90deg,var(--green),var(--cyan))}
+.s.p::before{background:linear-gradient(90deg,var(--purple),var(--pink))}
+.s.r::before{background:linear-gradient(90deg,var(--red),var(--pink))}
+.s.c::before{background:linear-gradient(90deg,var(--cyan),var(--blue))}
+.si{font-size:18px;margin-bottom:10px}
+.sv{font-size:30px;font-weight:900;line-height:1;margin-bottom:4px}
+.s.a .sv{color:var(--amber)}.s.b .sv{color:var(--blue)}.s.g .sv{color:var(--green)}.s.p .sv{color:var(--purple)}.s.r .sv{color:var(--red)}.s.c .sv{color:var(--cyan)}
+.sl{font-size:12px;color:var(--t2);font-weight:500}
+.ss{font-size:10px;color:var(--t3);margin-top:6px}
 
-        body {
-            font-family: 'Inter', -apple-system, system-ui, sans-serif;
-            background: var(--bg);
-            color: var(--t1);
-            -webkit-font-smoothing: antialiased;
-            min-height: 100vh;
-        }
+/* Card */
+.cd{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:12px}
+.ct{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;margin-bottom:16px}
+.ic{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px}
 
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background:
-                radial-gradient(ellipse 50% 40% at 15% 5%, rgba(59,130,246,0.07) 0%, transparent 50%),
-                radial-gradient(ellipse 40% 40% at 85% 95%, rgba(139,92,246,0.05) 0%, transparent 50%);
-            pointer-events: none;
-        }
+/* Pipeline */
+.pipe{display:flex;flex-direction:column;gap:8px}
+.pr{display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,0.015);border:1px solid var(--border);border-radius:10px}
+.pi{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.pinfo{flex:1;min-width:0}
+.pn{font-size:13px;font-weight:500}
+.pd{font-size:10px;color:var(--t3);margin-top:1px}
+.pb{height:3px;background:rgba(255,255,255,0.04);border-radius:3px;margin-top:6px;overflow:hidden}
+.pf{height:100%;border-radius:3px;transition:width .8s ease}
+.pnum{font-size:22px;font-weight:800;min-width:40px;text-align:right}
 
-        .app { position: relative; z-index: 1; padding: 12px; max-width: 900px; margin: 0 auto; }
+/* Table */
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -18px;padding:0 18px}
+.tb{width:100%;border-collapse:collapse;min-width:650px}
+.tb th{text-align:left;padding:10px 12px;font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);white-space:nowrap}
+.tb td{padding:10px 12px;font-size:12px;color:var(--t2);border-bottom:1px solid var(--border);white-space:nowrap}
+.tb tr:last-child td{border-bottom:none}
+.oid{font-family:'SF Mono',monospace;font-size:11px;color:var(--cyan)}
+.tg{display:inline-flex;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:600}
+.tg.tt{background:rgba(0,0,0,0.4);border:1px solid rgba(255,0,80,0.25);color:#ff0050}
+.tg.pd2{background:rgba(245,158,11,0.1);color:var(--amber)}
+.tg.up{background:rgba(239,68,68,0.1);color:var(--red)}
 
-        /* === HEADER === */
-        .header {
-            background: linear-gradient(135deg, var(--card) 0%, rgba(59,130,246,0.06) 100%);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 12px;
-        }
-        .header-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
-        .header h1 {
-            font-size: 22px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #fff, var(--cyan));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            line-height: 1.2;
-        }
-        .header .sub { color: var(--t2); font-size: 12px; margin-top: 4px; }
-        .live-badge {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 5px 12px;
-            background: rgba(16,185,129,0.1);
-            border: 1px solid rgba(16,185,129,0.25);
-            border-radius: 100px;
-            font-size: 11px;
-            color: var(--green);
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-        .live-dot {
-            width: 6px; height: 6px;
-            background: var(--green);
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0%,100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.4); }
-            50% { box-shadow: 0 0 0 6px rgba(16,185,129,0); }
-        }
-        .header-time { font-size: 11px; color: var(--t3); margin-top: 10px; }
+/* Year */
+.yr{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+.yi{padding:14px 10px;background:rgba(255,255,255,0.015);border:1px solid var(--border);border-radius:10px;text-align:center}
+.yv{font-size:22px;font-weight:800;margin-bottom:2px}
+.yl{font-size:10px;color:var(--t3)}
 
-        /* === STAT CARDS (2x2 grid) === */
-        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-        .stat {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 16px;
-            position: relative;
-            overflow: hidden;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .stat:active { transform: scale(0.97); }
-        .stat::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 2.5px;
-        }
-        .stat.s-amber::before { background: linear-gradient(90deg, var(--amber), var(--red)); }
-        .stat.s-blue::before { background: linear-gradient(90deg, var(--blue), var(--cyan)); }
-        .stat.s-green::before { background: linear-gradient(90deg, var(--green), var(--cyan)); }
-        .stat.s-purple::before { background: linear-gradient(90deg, var(--purple), var(--pink)); }
-        .stat.s-red::before { background: linear-gradient(90deg, var(--red), var(--pink)); }
-        .stat.s-cyan::before { background: linear-gradient(90deg, var(--cyan), var(--blue)); }
+/* Inventory + Account grid */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ig{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ii{padding:14px;background:rgba(255,255,255,0.015);border:1px solid var(--border);border-radius:10px;text-align:center}
+.iv{font-size:24px;font-weight:800;margin-bottom:2px}
+.il{font-size:11px;color:var(--t3)}
+.ar{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}
+.al{font-size:11px;color:var(--t3);margin-bottom:3px}
+.amt{font-size:28px;font-weight:900}
+.amt.neg{color:var(--red)}
+.ac{font-size:14px;color:var(--t2)}
+.cb{height:6px;background:rgba(255,255,255,0.04);border-radius:6px;overflow:hidden;margin-bottom:12px}
+.cf{height:100%;background:linear-gradient(90deg,var(--red),var(--amber));border-radius:6px}
+.as{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ab{padding:12px;border-radius:10px;text-align:center}
+.ab .lb{font-size:11px;color:var(--t3)}.ab .vl{font-size:18px;font-weight:700;margin-top:3px}
 
-        .stat-icon { font-size: 18px; margin-bottom: 10px; }
-        .stat-val { font-size: 30px; font-weight: 900; line-height: 1; margin-bottom: 4px; }
-        .stat.s-amber .stat-val { color: var(--amber); }
-        .stat.s-blue .stat-val { color: var(--blue); }
-        .stat.s-green .stat-val { color: var(--green); }
-        .stat.s-purple .stat-val { color: var(--purple); }
-        .stat.s-red .stat-val { color: var(--red); }
-        .stat.s-cyan .stat-val { color: var(--cyan); }
-        .stat-lbl { font-size: 12px; color: var(--t2); font-weight: 500; }
-        .stat-sub { font-size: 10px; color: var(--t3); margin-top: 6px; }
+/* Footer */
+.ft{text-align:center;padding:16px 0;color:var(--t3);font-size:11px}
+.ft a{color:var(--blue);text-decoration:none}
 
-        /* === CARDS === */
-        .card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 18px;
-            margin-bottom: 12px;
-        }
-        .card-title {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 16px;
-        }
-        .card-title .ic {
-            width: 28px; height: 28px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-        }
+/* Animations */
+@keyframes fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.s,.cd{animation:fu .5s ease forwards;opacity:0}
+.s:nth-child(1),.cd:nth-child(1){animation-delay:.05s}.s:nth-child(2),.cd:nth-child(2){animation-delay:.1s}.s:nth-child(3),.cd:nth-child(3){animation-delay:.15s}.s:nth-child(4),.cd:nth-child(4){animation-delay:.2s}.s:nth-child(5),.cd:nth-child(5){animation-delay:.25s}.s:nth-child(6),.cd:nth-child(6){animation-delay:.3s}
 
-        /* === PIPELINE === */
-        .pipe { display: flex; flex-direction: column; gap: 8px; }
-        .pipe-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            background: rgba(255,255,255,0.015);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-        }
-        .pipe-ic {
-            width: 36px; height: 36px;
-            border-radius: 9px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            flex-shrink: 0;
-        }
-        .pipe-info { flex: 1; min-width: 0; }
-        .pipe-name { font-size: 13px; font-weight: 500; }
-        .pipe-desc { font-size: 10px; color: var(--t3); margin-top: 1px; }
-        .pipe-bar { height: 3px; background: rgba(255,255,255,0.04); border-radius: 3px; margin-top: 6px; overflow: hidden; }
-        .pipe-fill { height: 100%; border-radius: 3px; transition: width 0.8s ease; }
-        .pipe-num { font-size: 22px; font-weight: 800; min-width: 40px; text-align: right; }
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:2px}
 
-        /* === CHARTS === */
-        .chart-wrap { position: relative; height: 200px; }
-
-        /* === TABLE (scrollable on mobile) === */
-        .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 -18px; padding: 0 18px; }
-        .tbl { width: 100%; border-collapse: collapse; min-width: 600px; }
-        .tbl th {
-            text-align: left;
-            padding: 10px 12px;
-            font-size: 10px;
-            font-weight: 600;
-            color: var(--t3);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 1px solid var(--border);
-            white-space: nowrap;
-        }
-        .tbl td {
-            padding: 10px 12px;
-            font-size: 12px;
-            color: var(--t2);
-            border-bottom: 1px solid var(--border);
-            white-space: nowrap;
-        }
-        .tbl tr:last-child td { border-bottom: none; }
-        .tbl tr:active td { background: rgba(255,255,255,0.02); }
-        .oid { font-family: 'SF Mono', monospace; font-size: 11px; color: var(--cyan); }
-        .tag {
-            display: inline-flex;
-            padding: 2px 8px;
-            border-radius: 5px;
-            font-size: 10px;
-            font-weight: 600;
-        }
-        .tag.tt { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,0,80,0.25); color: #ff0050; }
-        .tag.pending { background: rgba(245,158,11,0.1); color: var(--amber); }
-        .tag.unprinted { background: rgba(239,68,68,0.1); color: var(--red); }
-        .tag.shipped { background: rgba(16,185,129,0.1); color: var(--green); }
-        .tag.gofo { background: rgba(139,92,246,0.1); color: var(--purple); }
-        .tag.usps { background: rgba(59,130,246,0.1); color: var(--blue); }
-
-        /* === INVENTORY GRID === */
-        .inv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .inv-item {
-            padding: 14px;
-            background: rgba(255,255,255,0.015);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            text-align: center;
-        }
-        .inv-val { font-size: 24px; font-weight: 800; margin-bottom: 2px; }
-        .inv-lbl { font-size: 11px; color: var(--t3); }
-
-        /* === ACCOUNT === */
-        .acct-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
-        .acct-label { font-size: 11px; color: var(--t3); margin-bottom: 3px; }
-        .acct-amt { font-size: 28px; font-weight: 900; }
-        .acct-amt.neg { color: var(--red); }
-        .acct-credit { font-size: 14px; color: var(--t2); }
-        .credit-bar { height: 6px; background: rgba(255,255,255,0.04); border-radius: 6px; overflow: hidden; margin-bottom: 12px; }
-        .credit-fill { height: 100%; background: linear-gradient(90deg, var(--red), var(--amber)); border-radius: 6px; }
-        .acct-split { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .acct-box {
-            padding: 12px;
-            border-radius: 10px;
-            text-align: center;
-        }
-        .acct-box .lbl { font-size: 11px; color: var(--t3); }
-        .acct-box .val { font-size: 18px; font-weight: 700; margin-top: 3px; }
-
-        /* === YEAR SUMMARY === */
-        .year-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px; }
-        .year-item {
-            padding: 14px 10px;
-            background: rgba(255,255,255,0.015);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            text-align: center;
-        }
-        .year-val { font-size: 22px; font-weight: 800; margin-bottom: 2px; }
-        .year-lbl { font-size: 10px; color: var(--t3); }
-
-        /* === FOOTER === */
-        .footer { text-align: center; padding: 16px 0; color: var(--t3); font-size: 11px; }
-        .footer a { color: var(--blue); text-decoration: none; }
-
-        /* === ANIMATIONS === */
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-        .stat, .card { animation: fadeUp 0.5s ease forwards; opacity: 0; }
-        .stat:nth-child(1), .card:nth-child(1) { animation-delay: 0.05s; }
-        .stat:nth-child(2), .card:nth-child(2) { animation-delay: 0.1s; }
-        .stat:nth-child(3), .card:nth-child(3) { animation-delay: 0.15s; }
-        .stat:nth-child(4), .card:nth-child(4) { animation-delay: 0.2s; }
-        .stat:nth-child(5), .card:nth-child(5) { animation-delay: 0.25s; }
-        .stat:nth-child(6), .card:nth-child(6) { animation-delay: 0.3s; }
-
-        /* === SCROLLBAR === */
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
-
-        /* === DESKTOP === */
-        @media (min-width: 640px) {
-            .app { padding: 20px; }
-            .header { padding: 28px; }
-            .header h1 { font-size: 28px; }
-            .stats { grid-template-columns: repeat(3, 1fr); gap: 14px; }
-            .stat { padding: 20px; }
-            .stat-val { font-size: 36px; }
-            .chart-wrap { height: 260px; }
-        }
-
-        @media (min-width: 900px) {
-            .stats { grid-template-columns: repeat(6, 1fr); }
-        }
-
-        /* === LANDSCAPE MOBILE === */
-        @media (max-height: 500px) and (orientation: landscape) {
-            .stats { grid-template-columns: repeat(3, 1fr); }
-        }
-    </style>
+@media(min-width:640px){.app{padding:20px}.hdr{padding:28px}.hdr h1{font-size:28px}.stats{grid-template-columns:repeat(3,1fr);gap:14px}.s{padding:20px}.sv{font-size:36px}.chart-wrap{height:260px}}
+@media(min-width:900px){.stats{grid-template-columns:repeat(6,1fr)}}
+</style>
 </head>
 <body>
-    <div class="app">
-        <!-- Header -->
-        <div class="header">
-            <div class="header-top">
-                <div>
-                    <h1>✈️ Sunny & Lucky Skies</h1>
-                    <div class="sub">OMS 运营看板 · 领星海外仓 · TikTok US</div>
-                </div>
-                <div class="live-badge"><div class="live-dot"></div>运行中</div>
-            </div>
-            <div class="header-time">更新于 2026-06-14 05:09 CST</div>
-        </div>
+<div class="app">
+<div class="hdr">
+<div class="hdr-top">
+<div><h1>✈️ Sunny & Lucky Skies</h1><div class="sub">OMS 运营看板 · 领星海外仓 · TikTok US</div></div>
+<div class="live"><div class="dot"></div>运行中</div>
+</div>
+<div class="hdr-time">更新于 2026-06-14 14:56 CST</div>
+</div>
 
-        <!-- Stats -->
-        <div class="stats">
-            <div class="stat s-amber">
-                <div class="stat-icon">⏳</div>
-                <div class="stat-val">7</div>
-                <div class="stat-lbl">待处理</div>
-                <div class="stat-sub">今日新增 4 单</div>
-            </div>
-            <div class="stat s-blue">
-                <div class="stat-icon">🔄</div>
-                <div class="stat-val">21</div>
-                <div class="stat-lbl">处理中</div>
-                <div class="stat-sub">一件代发</div>
-            </div>
-            <div class="stat s-green">
-                <div class="stat-icon">✅</div>
-                <div class="stat-val">3,921</div>
-                <div class="stat-lbl">已发货</div>
-                <div class="stat-sub">本年度累计</div>
-            </div>
-            <div class="stat s-cyan">
-                <div class="stat-icon">📦</div>
-                <div class="stat-val">2,333</div>
-                <div class="stat-lbl">在库总量</div>
-                <div class="stat-sub">14 SKU</div>
-            </div>
-            <div class="stat s-purple">
-                <div class="stat-icon">📊</div>
-                <div class="stat-val">113</div>
-                <div class="stat-lbl">本周发货</div>
-                <div class="stat-sub">一件代发</div>
-            </div>
-            <div class="stat s-red">
-                <div class="stat-icon">💰</div>
-                <div class="stat-val">-$498</div>
-                <div class="stat-lbl">账户余额</div>
-                <div class="stat-sub">额度 $1,000</div>
-            </div>
-        </div>
+<div class="stats">
+<div class="s a"><div class="si">⏳</div><div class="sv">18</div><div class="sl">待处理</div><div class="ss">比早上 +11 单</div></div>
+<div class="s b"><div class="si">🔄</div><div class="sv">21</div><div class="sl">处理中</div><div class="ss">一件代发</div></div>
+<div class="s g"><div class="si">✅</div><div class="sv">3,944</div><div class="sl">本年发货</div><div class="ss">一件代发累计</div></div>
+<div class="s c"><div class="si">📦</div><div class="sv">2,333</div><div class="sl">在库总量</div><div class="ss">14 SKU</div></div>
+<div class="s p"><div class="si">📊</div><div class="sv">186</div><div class="sl">本月发货</div><div class="ss">六月累计</div></div>
+<div class="s r"><div class="si">💰</div><div class="sv">-$498</div><div class="sl">账户余额</div><div class="ss">额度 $1,000</div></div>
+</div>
 
-        <!-- Year Summary -->
-        <div class="card">
-            <div class="card-title">
-                <div class="ic" style="background:rgba(6,182,212,0.12)">📅</div>
-                2026 年度总览
-            </div>
-            <div class="year-row">
-                <div class="year-item">
-                    <div class="year-val" style="color:var(--green)">3,944</div>
-                    <div class="year-lbl">一件代发</div>
-                </div>
-                <div class="year-item">
-                    <div class="year-val" style="color:var(--cyan)">14</div>
-                    <div class="year-lbl">入库单量</div>
-                </div>
-                <div class="year-item">
-                    <div class="year-val" style="color:var(--purple)">186</div>
-                    <div class="year-lbl">本月发货</div>
-                </div>
-            </div>
-            <div style="font-size:11px;color:var(--t3);text-align:center;">
-                日均发货 ≈ <span style="color:var(--amber);font-weight:700;">22</span> 单 · 月均 ≈ <span style="color:var(--amber);font-weight:700;">657</span> 单
-            </div>
-        </div>
+<!-- Year Summary -->
+<div class="cd">
+<div class="ct"><div class="ic" style="background:rgba(6,182,212,0.12)">📅</div>2026 年度总览</div>
+<div class="yr">
+<div class="yi"><div class="yv" style="color:var(--green)">3,944</div><div class="yl">一件代发</div></div>
+<div class="yi"><div class="yv" style="color:var(--cyan)">14</div><div class="yl">入库单量</div></div>
+<div class="yi"><div class="yv" style="color:var(--purple)">186</div><div class="yl">本月发货</div></div>
+</div>
+<div style="font-size:11px;color:var(--t3);text-align:center">日均发货 ≈ <span style="color:var(--amber);font-weight:700">22</span> 单 · 月均 ≈ <span style="color:var(--amber);font-weight:700">657</span> 单</div>
+</div>
 
-        <!-- Charts Row -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-            <!-- Weekly Chart -->
-            <div class="card">
-                <div class="card-title">
-                    <div class="ic" style="background:rgba(59,130,246,0.12)">📈</div>
-                    本周单量
-                </div>
-                <div class="chart-wrap">
-                    <canvas id="weeklyChart"></canvas>
-                </div>
-            </div>
+<!-- Charts -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<div class="cd"><div class="ct"><div class="ic" style="background:rgba(59,130,246,0.12)">📈</div>本周单量</div><div style="height:200px"><canvas id="wc"></canvas></div></div>
+<div class="cd"><div class="ct"><div class="ic" style="background:rgba(139,92,246,0.12)">🧩</div>产品分布</div><div style="height:200px"><canvas id="pc"></canvas></div></div>
+</div>
 
-            <!-- Monthly Product Mix -->
-            <div class="card">
-                <div class="card-title">
-                    <div class="ic" style="background:rgba(139,92,246,0.12)">🧩</div>
-                    产品分布
-                </div>
-                <div class="chart-wrap">
-                    <canvas id="productChart"></canvas>
-                </div>
-            </div>
-        </div>
+<!-- Pipeline -->
+<div class="cd">
+<div class="ct"><div class="ic" style="background:rgba(245,158,11,0.12)">🔄</div>订单流水线</div>
+<div class="pipe">
+<div class="pr"><div class="pi" style="background:rgba(245,158,11,0.12)">📥</div><div class="pinfo"><div class="pn">待入库</div><div class="pd">等待仓库接收</div><div class="pb"><div class="pf" style="width:20%;background:var(--amber)"></div></div></div><div class="pnum" style="color:var(--amber)">2</div></div>
+<div class="pr"><div class="pi" style="background:rgba(239,68,68,0.12)">⏳</div><div class="pinfo"><div class="pn">待处理</div><div class="pd">审核 / 分配仓库</div><div class="pb"><div class="pf" style="width:45%;background:var(--red)"></div></div></div><div class="pnum" style="color:var(--red)">18</div></div>
+<div class="pr"><div class="pi" style="background:rgba(59,130,246,0.12)">🔄</div><div class="pinfo"><div class="pn">处理中</div><div class="pd">一件代发 · 派送</div><div class="pb"><div class="pf" style="width:70%;background:var(--blue)"></div></div></div><div class="pnum" style="color:var(--blue)">21</div></div>
+<div class="pr"><div class="pi" style="background:rgba(16,185,129,0.12)">✅</div><div class="pinfo"><div class="pn">已发货</div><div class="pd">本年度累计</div><div class="pb"><div class="pf" style="width:100%;background:var(--green)"></div></div></div><div class="pnum" style="color:var(--green)">3,944</div></div>
+</div>
+</div>
 
-        <!-- Pipeline -->
-        <div class="card">
-            <div class="card-title">
-                <div class="ic" style="background:rgba(245,158,11,0.12)">🔄</div>
-                订单流水线
-            </div>
-            <div class="pipe">
-                <div class="pipe-row">
-                    <div class="pipe-ic" style="background:rgba(245,158,11,0.12)">📥</div>
-                    <div class="pipe-info">
-                        <div class="pipe-name">待入库</div>
-                        <div class="pipe-desc">等待仓库接收</div>
-                        <div class="pipe-bar"><div class="pipe-fill" style="width:20%;background:var(--amber)"></div></div>
-                    </div>
-                    <div class="pipe-num" style="color:var(--amber)">2</div>
-                </div>
-                <div class="pipe-row">
-                    <div class="pipe-ic" style="background:rgba(239,68,68,0.12)">⏳</div>
-                    <div class="pipe-info">
-                        <div class="pipe-name">待处理</div>
-                        <div class="pipe-desc">审核 / 分配仓库</div>
-                        <div class="pipe-bar"><div class="pipe-fill" style="width:35%;background:var(--red)"></div></div>
-                    </div>
-                    <div class="pipe-num" style="color:var(--red)">7</div>
-                </div>
-                <div class="pipe-row">
-                    <div class="pipe-ic" style="background:rgba(59,130,246,0.12)">🔄</div>
-                    <div class="pipe-info">
-                        <div class="pipe-name">处理中</div>
-                        <div class="pipe-desc">一件代发 · 派送</div>
-                        <div class="pipe-bar"><div class="pipe-fill" style="width:70%;background:var(--blue)"></div></div>
-                    </div>
-                    <div class="pipe-num" style="color:var(--blue)">21</div>
-                </div>
-                <div class="pipe-row">
-                    <div class="pipe-ic" style="background:rgba(16,185,129,0.12)">✅</div>
-                    <div class="pipe-info">
-                        <div class="pipe-name">已发货</div>
-                        <div class="pipe-desc">本年度累计</div>
-                        <div class="pipe-bar"><div class="pipe-fill" style="width:100%;background:var(--green)"></div></div>
-                    </div>
-                    <div class="pipe-num" style="color:var(--green)">3,921</div>
-                </div>
-            </div>
-        </div>
+<!-- Pending Orders 18 -->
+<div class="cd">
+<div class="ct"><div class="ic" style="background:rgba(239,68,68,0.12)">📋</div>待处理订单 · 18 单</div>
+<div class="tw"><table class="tb"><thead><tr><th>平台</th><th>单号</th><th>产品</th><th>店铺</th><th>邮编</th><th>时间</th><th>状态</th></tr></thead><tbody>
+<tr><td><span class="tg tt">TikTok</span></td><td><span class="oid">577432685782209353</span></td><td>pjqjj-001 ×1</td><td>Sunny&Lucky</td><td>93036</td><td>06-14 10:17</td><td><span class="tg pd2">待审</span> <span class="tg up">未打印</span></td></tr>
+<tr><td><span class="tg tt">TikTok</span></td><td><span class="oid">577432684661412416</span></td><td>ysd-003 ×1</td><td>MungKopin</td><td>68144</td><td>06-14 10:15</td><td><span class="tg pd2">待审</span> <span class="tg up">未打印</span></td></tr>
+<tr><td><span class="tg tt">TikTok</span></td><td><span class="oid">577432646627726015</span></td><td>pjqjj-001 ×2</td><td>Sunny&Lucky</td><td>77536</td><td>06-14 09:48</td><td><span class="tg pd2">待审</span> <span class="tg up">未打印</span></td></tr>
+<tr><td><span class="tg tt">TikTok</span></td><td><span class="oid">577432616288031527</span></td><td>pjqjj-001 ×1</td><td>Sunny&Lucky</td><td>78413</td><td>06-14 09:25</td><td><span class="tg pd2">待审</span> <span class="tg up">未打印</span></td></tr>
+<tr><td><span class="tg tt">TikTok</span></td><td><span class="oid">577432491475308996</span></td><td>ysd-003 ×1</td><td>Sunny&Lucky</td><td>92114</td><td>06-14 07:41</td><td><span class="tg pd2">待审</span> <span class="tg up">未打印</span></td></tr>
+<tr><td><span class="tg tt">TikTok</span></td><td><span class="oid">577432431465828610</span></td><td>ysd-003 ×1</td><td>Sunny&Lucky</td><td>33167</td><td>06-14 06:48</td><td><span class="tg pd2">待审</span> <span class="tg up">未打印</span></td></tr>
+<tr><td><span class="tg tt">TikTok</span></td><td><span class="oid">577432433017065519</span></td><td>ysd-003 ×1</td><td>Sunny&Lucky</td><td>21128</td><td>06-14 06:51</td><td><span class="tg pd2">待审</span> <span class="tg up">未打印</span></td></tr>
+<tr><td><span class="tg tt">TikTok</span></td><td><span class="oid">577432376335700646</span></td><td>ysd-003 ×1</td><td>Sunny&Lucky</td><td>38109</td><td>06-14 06:02</td><td><span class="tg pd2">待审</span> <span class="tg up">未打印</span></td></tr>
+<tr><td><span class="tg tt">TikTok</span></td><td><span class="oid">577432365322440842</span></td><td>ysd-005 ×1</td><td>MungKopin</td><td>90007</td><td>06-14 05:53</td><td><span class="tg pd2">待审</span> <span class="tg up">未打印</span></td></tr>
+<tr><td><span class="tg tt">TikTok</span></td><td><span class="oid">577432358844534817</span></td><td>ysd-003 ×1</td><td>MungKopin</td><td>90025</td><td>06-14 05:46</td><td><span class="tg pd2">待审</span> <span class="tg up">未打印</span></td></tr>
+<tr><td><span class="tg tt">TikTok</span></td><td><span class="oid">577432304370225439</span></td><td>ysd-003 ×1</td><td>Sunny&Lucky</td><td>85308</td><td>06-14 05:04</td><td><span class="tg pd2">待审</span> <span class="tg up">未打印</span></td></tr>
+<tr><td><span class="tg tt">TikTok</span></td><td><span class="oid">577432202315207652</span></td><td>ysd-003 ×1</td><td>Sunny&Lucky</td><td>90019</td><td>06-14 03:34</td><td><span class="tg pd2">待审</span> <span class="tg up">未打印</span></td></tr>
+<tr><td><span class="tg tt">TikTok</span></td><td><span class="oid">577432203530637815</span></td><td>ysd-004 ×1</td><td>Sunny&Lucky</td><td>08753</td><td>06-14 03:36</td><td><span class="tg pd2">待审</span> <span class="tg up">未打印</span></td></tr>
+<tr><td><span class="tg tt">TikTok</span></td><td><span class="oid">577432010943337172</span></td><td>pjqjj-001 ×1</td><td>Sunny&Lucky</td><td>11204</td><td>06-14 00:59</td><td><span class="tg pd2">待审</span> <span class="tg up">未打印</span></td></tr>
+<tr><td><span class="tg tt">TikTok</span></td><td><span class="oid">577431925413811005</span></td><td>ysd-004 ×1</td><td>Sunny&Lucky</td><td>03060</td><td>06-13 23:59</td><td><span class="tg pd2">待审</span> <span class="tg up">未打印</span></td></tr>
+<tr><td><span class="tg tt">TikTok</span></td><td><span class="oid">577431922182165158</span></td><td>pjqjj-001 ×1</td><td>Sunny&Lucky</td><td>23831</td><td>06-13 23:53</td><td><span class="tg pd2">待审</span> <span class="tg up">未打印</span></td></tr>
+<tr><td><span class="tg tt">TikTok</span></td><td><span class="oid">577431878235820678</span></td><td>ysd-003 ×1</td><td>Sunny&Lucky</td><td>22306</td><td>06-13 23:24</td><td><span class="tg pd2">待审</span> <span class="tg up">未打印</span></td></tr>
+<tr><td><span class="tg tt">TikTok</span></td><td><span class="oid">577431836546601413</span></td><td>ysd-004 ×1</td><td>Sunny&Lucky</td><td>44612</td><td>06-13 22:47</td><td><span class="tg pd2">待审</span> <span class="tg up">未打印</span></td></tr>
+</tbody></table></div>
+</div>
 
-        <!-- Pending Orders -->
-        <div class="card">
-            <div class="card-title">
-                <div class="ic" style="background:rgba(239,68,68,0.12)">📋</div>
-                待处理订单 · 7 单
-            </div>
-            <div class="tbl-wrap">
-                <table class="tbl">
-                    <thead>
-                        <tr>
-                            <th>平台</th>
-                            <th>单号</th>
-                            <th>产品</th>
-                            <th>邮编</th>
-                            <th>时间</th>
-                            <th>状态</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><span class="tag tt">TikTok</span></td>
-                            <td><span class="oid">577432202315207652</span></td>
-                            <td>ysd-003 ×1</td>
-                            <td>90019</td>
-                            <td>06-14 03:34</td>
-                            <td><span class="tag pending">待审</span> <span class="tag unprinted">未打印</span></td>
-                        </tr>
-                        <tr>
-                            <td><span class="tag tt">TikTok</span></td>
-                            <td><span class="oid">577432203530637815</span></td>
-                            <td>ysd-004 ×1</td>
-                            <td>08753</td>
-                            <td>06-14 03:36</td>
-                            <td><span class="tag pending">待审</span> <span class="tag unprinted">未打印</span></td>
-                        </tr>
-                        <tr>
-                            <td><span class="tag tt">TikTok</span></td>
-                            <td><span class="oid">577432010943337172</span></td>
-                            <td>pjqjj-001 ×1</td>
-                            <td>11204</td>
-                            <td>06-14 00:59</td>
-                            <td><span class="tag pending">待审</span> <span class="tag unprinted">未打印</span></td>
-                        </tr>
-                        <tr>
-                            <td><span class="tag tt">TikTok</span></td>
-                            <td><span class="oid">577431925413811005</span></td>
-                            <td>ysd-004 ×1</td>
-                            <td>03060</td>
-                            <td>06-13 23:59</td>
-                            <td><span class="tag pending">待审</span> <span class="tag unprinted">未打印</span></td>
-                        </tr>
-                        <tr>
-                            <td><span class="tag tt">TikTok</span></td>
-                            <td><span class="oid">577431922182165158</span></td>
-                            <td>pjqjj-001 ×1</td>
-                            <td>23831</td>
-                            <td>06-13 23:53</td>
-                            <td><span class="tag pending">待审</span> <span class="tag unprinted">未打印</span></td>
-                        </tr>
-                        <tr>
-                            <td><span class="tag tt">TikTok</span></td>
-                            <td><span class="oid">577431878235820678</span></td>
-                            <td>ysd-003 ×1</td>
-                            <td>22306</td>
-                            <td>06-13 23:24</td>
-                            <td><span class="tag pending">待审</span> <span class="tag unprinted">未打印</span></td>
-                        </tr>
-                        <tr>
-                            <td><span class="tag tt">TikTok</span></td>
-                            <td><span class="oid">577431836546601413</span></td>
-                            <td>ysd-004 ×1</td>
-                            <td>44612</td>
-                            <td>06-13 22:47</td>
-                            <td><span class="tag pending">待审</span> <span class="tag unprinted">未打印</span></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+<!-- Inventory + Account -->
+<div class="g2">
+<div class="cd">
+<div class="ct"><div class="ic" style="background:rgba(6,182,212,0.12)">📦</div>库存</div>
+<div class="ig">
+<div class="ii"><div class="iv" style="color:var(--cyan)">2,333</div><div class="il">在库总数</div></div>
+<div class="ii"><div class="iv" style="color:var(--green)">3,332</div><div class="il">产品库存</div></div>
+<div class="ii"><div class="iv" style="color:var(--purple)">14</div><div class="il">可用 SKU</div></div>
+<div class="ii"><div class="iv" style="color:var(--t3)">0</div><div class="il">退货库存</div></div>
+</div>
+<div style="margin-top:12px;height:130px"><canvas id="ic2"></canvas></div>
+</div>
+<div class="cd">
+<div class="ct"><div class="ic" style="background:rgba(236,72,153,0.12)">💰</div>账户资产</div>
+<div class="ar"><div><div class="al">当前余额 (USD)</div><div class="amt neg">-$498.06</div></div><div style="text-align:right"><div class="al">信用额度</div><div class="ac">$1,000</div></div></div>
+<div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:10px;color:var(--t3)">已用 49.8%</span><span style="font-size:10px;color:var(--amber)">额度使用中</span></div><div class="cb"><div class="cf" style="width:49.8%"></div></div></div>
+<div class="as">
+<div class="ab" style="background:rgba(239,68,68,0.06)"><div class="lb">已用</div><div class="vl" style="color:var(--red)">$498.06</div></div>
+<div class="ab" style="background:rgba(16,185,129,0.06)"><div class="lb">可用</div><div class="vl" style="color:var(--green)">$501.94</div></div>
+</div>
+</div>
+</div>
 
-        <!-- Shipped Orders (Recent) -->
-        <div class="card">
-            <div class="card-title">
-                <div class="ic" style="background:rgba(16,185,129,0.12)">🚚</div>
-                近期已发货 · GOFO / USPS
-            </div>
-            <div class="tbl-wrap">
-                <table class="tbl">
-                    <thead>
-                        <tr>
-                            <th>单号</th>
-                            <th>产品</th>
-                            <th>承运商</th>
-                            <th>发货时间</th>
-                            <th>仓库</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><span class="oid">577430081718554926</span></td>
-                            <td>ysd-004 ×1</td>
-                            <td><span class="tag usps">USPS</span></td>
-                            <td>06-12 22:03</td>
-                            <td>亚特兰大仓</td>
-                        </tr>
-                        <tr>
-                            <td><span class="oid">577429345679676139</span></td>
-                            <td>ysd-004 ×1</td>
-                            <td><span class="tag gofo">GOFO</span></td>
-                            <td>06-12 22:03</td>
-                            <td>亚特兰大仓</td>
-                        </tr>
-                        <tr>
-                            <td><span class="oid">577429331150279192</span></td>
-                            <td>ysd-003 ×1</td>
-                            <td><span class="tag gofo">GOFO</span></td>
-                            <td>06-12 22:03</td>
-                            <td>亚特兰大仓</td>
-                        </tr>
-                        <tr>
-                            <td><span class="oid">577429292155179060</span></td>
-                            <td>ysd-003 ×1</td>
-                            <td><span class="tag gofo">GOFO</span></td>
-                            <td>06-12 22:03</td>
-                            <td>亚特兰大仓</td>
-                        </tr>
-                        <tr>
-                            <td><span class="oid">577429113596776913</span></td>
-                            <td>ysd-003 ×1</td>
-                            <td><span class="tag gofo">GOFO</span></td>
-                            <td>06-12 22:03</td>
-                            <td>亚特兰大仓</td>
-                        </tr>
-                        <tr>
-                            <td><span class="oid">577427645909144196</span></td>
-                            <td>ysd-004 ×1</td>
-                            <td><span class="tag usps">USPS</span></td>
-                            <td>06-11 22:23</td>
-                            <td>亚特兰大仓</td>
-                        </tr>
-                        <tr>
-                            <td><span class="oid">577428065010487735</span></td>
-                            <td>ysd-004 ×1</td>
-                            <td><span class="tag usps">USPS</span></td>
-                            <td>06-11 22:23</td>
-                            <td>亚特兰大仓</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+<!-- Logistics -->
+<div class="cd">
+<div class="ct"><div class="ic" style="background:rgba(139,92,246,0.12)">🚚</div>物流分析</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+<div style="padding:14px;background:rgba(139,92,246,0.06);border:1px solid var(--border);border-radius:10px;text-align:center"><div style="font-size:11px;color:var(--t3);margin-bottom:4px">主要承运商</div><div style="font-size:16px;font-weight:700;color:var(--purple)">GOFO</div><div style="font-size:10px;color:var(--t3);margin-top:2px">约 75% 订单</div></div>
+<div style="padding:14px;background:rgba(59,130,246,0.06);border:1px solid var(--border);border-radius:10px;text-align:center"><div style="font-size:11px;color:var(--t3);margin-bottom:4px">次要承运商</div><div style="font-size:16px;font-weight:700;color:var(--blue)">USPS</div><div style="font-size:10px;color:var(--t3);margin-top:2px">约 25% 订单</div></div>
+<div style="padding:14px;background:rgba(6,182,212,0.06);border:1px solid var(--border);border-radius:10px;text-align:center"><div style="font-size:11px;color:var(--t3);margin-bottom:4px">发货仓库</div><div style="font-size:16px;font-weight:700;color:var(--cyan)">亚特兰大</div><div style="font-size:10px;color:var(--t3);margin-top:2px">US04</div></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+<div style="padding:12px;background:rgba(255,255,255,0.015);border:1px solid var(--border);border-radius:10px;text-align:center"><div style="font-size:11px;color:var(--t3);margin-bottom:4px">履约方式</div><div style="font-size:14px;font-weight:700;color:var(--amber)">100% 平台面单</div></div>
+<div style="padding:12px;background:rgba(255,255,255,0.015);border:1px solid var(--border);border-radius:10px;text-align:center"><div style="font-size:11px;color:var(--t3);margin-bottom:4px">销售平台</div><div style="font-size:14px;font-weight:700;color:var(--green)">TikTok US</div></div>
+</div>
+</div>
 
-        <!-- Inventory + Account Row -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-            <!-- Inventory -->
-            <div class="card">
-                <div class="card-title">
-                    <div class="ic" style="background:rgba(6,182,212,0.12)">📦</div>
-                    库存
-                </div>
-                <div class="inv-grid">
-                    <div class="inv-item">
-                        <div class="inv-val" style="color:var(--cyan)">2,333</div>
-                        <div class="inv-lbl">在库总数</div>
-                    </div>
-                    <div class="inv-item">
-                        <div class="inv-val" style="color:var(--green)">3,332</div>
-                        <div class="inv-lbl">产品库存</div>
-                    </div>
-                    <div class="inv-item">
-                        <div class="inv-val" style="color:var(--purple)">14</div>
-                        <div class="inv-lbl">可用 SKU</div>
-                    </div>
-                    <div class="inv-item">
-                        <div class="inv-val" style="color:var(--t3)">0</div>
-                        <div class="inv-lbl">退货库存</div>
-                    </div>
-                </div>
-                <div style="margin-top:12px;height:130px;">
-                    <canvas id="invChart"></canvas>
-                </div>
-            </div>
+<!-- Product Analysis -->
+<div class="cd">
+<div class="ct"><div class="ic" style="background:rgba(16,185,129,0.12)">🏷️</div>产品分析 · 2 店铺</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+<div style="padding:14px;background:rgba(59,130,246,0.06);border:1px solid var(--border);border-radius:10px">
+<div style="font-size:13px;font-weight:600;color:var(--blue);margin-bottom:8px">Sunny&Lucky Skies_US</div>
+<div style="font-size:11px;color:var(--t3);line-height:1.8">
+ysd-003 (9pcs) · ysd-004 (15pcs)<br>
+pjqjj-001 (1PC)
+</div>
+</div>
+<div style="padding:14px;background:rgba(139,92,246,0.06);border:1px solid var(--border);border-radius:10px">
+<div style="font-size:13px;font-weight:600;color:var(--purple);margin-bottom:8px">MungKopin_US</div>
+<div style="font-size:11px;color:var(--t3);line-height:1.8">
+ysd-003 (9pcs) · ysd-005 (18pcs)
+</div>
+</div>
+</div>
+</div>
 
-            <!-- Account -->
-            <div class="card">
-                <div class="card-title">
-                    <div class="ic" style="background:rgba(236,72,153,0.12)">💰</div>
-                    账户资产
-                </div>
-                <div class="acct-row">
-                    <div>
-                        <div class="acct-label">当前余额 (USD)</div>
-                        <div class="acct-amt neg">-$498.06</div>
-                    </div>
-                    <div style="text-align:right;">
-                        <div class="acct-label">信用额度</div>
-                        <div class="acct-credit">$1,000</div>
-                    </div>
-                </div>
-                <div>
-                    <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
-                        <span style="font-size:10px;color:var(--t3)">已用 49.8%</span>
-                        <span style="font-size:10px;color:var(--amber)">额度使用中</span>
-                    </div>
-                    <div class="credit-bar"><div class="credit-fill" style="width:49.8%"></div></div>
-                </div>
-                <div class="acct-split">
-                    <div class="acct-box" style="background:rgba(239,68,68,0.06);">
-                        <div class="lbl">已用</div>
-                        <div class="val" style="color:var(--red)">$498.06</div>
-                    </div>
-                    <div class="acct-box" style="background:rgba(16,185,129,0.06);">
-                        <div class="lbl">可用</div>
-                        <div class="val" style="color:var(--green)">$501.94</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="ft">Powered by <a href="#">OpenClaw</a> · Sunny & Lucky Skies · 2026</div>
+</div>
 
-        <!-- Logistics Analysis -->
-        <div class="card">
-            <div class="card-title">
-                <div class="ic" style="background:rgba(139,92,246,0.12)">🚚</div>
-                物流分析
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
-                <div style="padding:14px;background:rgba(139,92,246,0.06);border:1px solid var(--border);border-radius:10px;text-align:center;">
-                    <div style="font-size:11px;color:var(--t3);margin-bottom:4px;">主要承运商</div>
-                    <div style="font-size:16px;font-weight:700;color:var(--purple);">GOFO</div>
-                    <div style="font-size:10px;color:var(--t3);margin-top:2px;">约 75% 订单</div>
-                </div>
-                <div style="padding:14px;background:rgba(59,130,246,0.06);border:1px solid var(--border);border-radius:10px;text-align:center;">
-                    <div style="font-size:11px;color:var(--t3);margin-bottom:4px;">次要承运商</div>
-                    <div style="font-size:16px;font-weight:700;color:var(--blue);">USPS</div>
-                    <div style="font-size:10px;color:var(--t3);margin-top:2px;">约 25% 订单</div>
-                </div>
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
-                <div style="padding:12px;background:rgba(255,255,255,0.015);border:1px solid var(--border);border-radius:10px;text-align:center;">
-                    <div style="font-size:20px;font-weight:800;color:var(--cyan);">亚特兰大</div>
-                    <div style="font-size:10px;color:var(--t3);margin-top:2px;">US04 发货仓</div>
-                </div>
-                <div style="padding:12px;background:rgba(255,255,255,0.015);border:1px solid var(--border);border-radius:10px;text-align:center;">
-                    <div style="font-size:20px;font-weight:800;color:var(--amber);">100%</div>
-                    <div style="font-size:10px;color:var(--t3);margin-top:2px;">平台面单</div>
-                </div>
-                <div style="padding:12px;background:rgba(255,255,255,0.015);border:1px solid var(--border);border-radius:10px;text-align:center;">
-                    <div style="font-size:20px;font-weight:800;color:var(--green);">TikTok</div>
-                    <div style="font-size:10px;color:var(--t3);margin-top:2px;">唯一平台</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="footer">
-            Powered by <a href="#">OpenClaw</a> · Sunny & Lucky Skies · 2026
-        </div>
-    </div>
-
-    <script>
-        // Weekly chart
-        new Chart(document.getElementById('weeklyChart'), {
-            type: 'bar',
-            data: {
-                labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
-                datasets: [{
-                    label: '一件代发',
-                    data: [18, 22, 25, 19, 15, 8, 6],
-                    backgroundColor: 'rgba(59,130,246,0.5)',
-                    borderColor: 'rgba(59,130,246,0.8)',
-                    borderWidth: 1,
-                    borderRadius: 5,
-                    barPercentage: 0.55
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 10 } } },
-                    y: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#64748b', font: { size: 10 } }, beginAtZero: true }
-                }
-            }
-        });
-
-        // Product distribution (based on pending + recent shipped data)
-        new Chart(document.getElementById('productChart'), {
-            type: 'doughnut',
-            data: {
-                labels: ['ysd-003 (9pcs)', 'ysd-004 (15pcs)', 'pjqjj-001 (1PC)'],
-                datasets: [{
-                    data: [45, 40, 15],
-                    backgroundColor: ['rgba(59,130,246,0.7)', 'rgba(139,92,246,0.7)', 'rgba(236,72,153,0.7)'],
-                    borderColor: ['rgba(59,130,246,1)', 'rgba(139,92,246,1)', 'rgba(236,72,153,1)'],
-                    borderWidth: 2,
-                    hoverOffset: 6
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '62%',
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: { color: '#94a3b8', font: { size: 10 }, usePointStyle: true, pointStyle: 'circle', padding: 10 }
-                    }
-                }
-            }
-        });
-
-        // Inventory chart
-        new Chart(document.getElementById('invChart'), {
-            type: 'doughnut',
-            data: {
-                labels: ['产品库存', '箱库存', '退货库存'],
-                datasets: [{
-                    data: [3332, 0, 0],
-                    backgroundColor: ['rgba(6,182,212,0.6)', 'rgba(139,92,246,0.6)', 'rgba(236,72,153,0.6)'],
-                    borderColor: ['rgba(6,182,212,1)', 'rgba(139,92,246,1)', 'rgba(236,72,153,1)'],
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '60%',
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: { color: '#94a3b8', font: { size: 9 }, usePointStyle: true, pointStyle: 'circle', padding: 8 }
-                    }
-                }
-            }
-        });
-    </script>
+<script>
+new Chart(document.getElementById('wc'),{type:'bar',data:{labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],datasets:[{label:'一件代发',data:[18,22,25,19,15,8,6],backgroundColor:'rgba(59,130,246,0.5)',borderColor:'rgba(59,130,246,0.8)',borderWidth:1,borderRadius:5,barPercentage:0.55}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#64748b',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,0.03)'},ticks:{color:'#64748b',font:{size:10}},beginAtZero:true}}}});
+new Chart(document.getElementById('pc'),{type:'doughnut',data:{labels:['ysd-003 (9pcs)','ysd-004 (15pcs)','pjqjj-001 (1PC)','ysd-005 (18pcs)'],datasets:[{data:[45,30,15,10],backgroundColor:['rgba(59,130,246,0.7)','rgba(139,92,246,0.7)','rgba(236,72,153,0.7)','rgba(16,185,129,0.7)'],borderColor:['rgba(59,130,246,1)','rgba(139,92,246,1)','rgba(236,72,153,1)','rgba(16,185,129,1)'],borderWidth:2,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:10},usePointStyle:true,pointStyle:'circle',padding:10}}}}});
+new Chart(document.getElementById('ic2'),{type:'doughnut',data:{labels:['产品库存','箱库存','退货库存'],datasets:[{data:[3332,0,0],backgroundColor:['rgba(6,182,212,0.6)','rgba(139,92,246,0.6)','rgba(236,72,153,0.6)'],borderColor:['rgba(6,182,212,1)','rgba(139,92,246,1)','rgba(236,72,153,1)'],borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:9},usePointStyle:true,pointStyle:'circle',padding:8}}}}});
+</script>
 </body>
 </html>
